@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(fxtract_v1)
+project(fre-service_1.0)
 
 link_libraries(stdc++fs)
 
 add_subdirectory(logging)
 add_subdirectory(libfxtract)
-add_subdirectory(tests)
+add_subdirectory(msgqueue)
+#add_subdirectory(tests)
 
 set(main_source_files
  main.cpp
@@ -29,12 +30,12 @@ find_package(Threads REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
-add_executable (fxtract ${main_source_files})
-target_include_directories(fxtract PRIVATE ${amqpcpp_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-target_link_libraries(fxtract logger frelib -g ${Boost_LIBRARIES} Threads::Threads -lboost_serialization ev boost_system dl Threads::Threads ${amqpcpp_LIBRARIES} amqpcpp nlohmann_json::nlohmann_json)
+add_executable (fre-service ${main_source_files})
+target_include_directories(fre-service PRIVATE ${amqpcpp_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+target_link_libraries(fre-service logger frelib msgqueue -g ${Boost_LIBRARIES} Threads::Threads -lboost_serialization ev boost_system dl Threads::Threads ${amqpcpp_LIBRARIES} amqpcpp nlohmann_json::nlohmann_json)
 
 install(
-  TARGETS fxtract 
+  TARGETS fre-service 
   DESTINATION bin
 )
 
