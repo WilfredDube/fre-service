@@ -44,6 +44,7 @@ json FeatureRecognitionComplete::toJson()
     jsonObject["feature_props"] = jprops;
     jsonObject["user_id"] = userID;
     jsonObject["cadfile_id"] = cadFileID;
+    jsonObject["task_id"] = taskID;
 
     return jsonObject;
 }

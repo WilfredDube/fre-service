@@ -21,7 +21,7 @@ struct BendFeatures
 
 struct FeatureRecognitionComplete : public Event
 {
-    std::string userID, cadFileID;
+    std::string userID, cadFileID, taskID;
     std::vector<std::shared_ptr<Fxt::SheetMetalComponent::Bend::ModelBend>> bendFeatures;
     FeatureProps featureProps;
 

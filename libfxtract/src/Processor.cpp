@@ -44,6 +44,7 @@ std::shared_ptr<Event> ProcessCadFile(EventPtr event)
 
     result->cadFileID = cadFile->cadFileID;
     result->userID = cadFile->userID;
+    result->taskID = cadFile->taskID;
     result->totalTime = total_time; // Duplicate
     result->eventType = EventType::FEACTURE_REC_COMPLETE;
     auto bendFeatures = sheetMetalFeatureModel->getBends();

@@ -4,7 +4,7 @@
 
 struct FeatureRecognitionStarted : public Event
 {
-    std::string userID, cadFileID, URL;
+    std::string userID, cadFileID, taskID, URL;
 
     std::string EventName();
     void createEvent(std::string data);

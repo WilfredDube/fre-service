@@ -15,7 +15,7 @@ struct ProcessingPlan
 
 struct ProcessPlanningComplete : public Event
 {
-    std::string userID, cadFileID;
+    std::string userID, cadFileID, taskID;
     int processLevel;
     ProcessingPlan processingPlan;
     std::vector<FaceID> bendSequence;

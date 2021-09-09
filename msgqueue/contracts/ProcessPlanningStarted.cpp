@@ -13,10 +13,11 @@ void ProcessPlanningStarted::createEvent(std::string data)
 {
     auto j3 = json::parse(data);
 
-    this->userID = j3["user_id"];
-    this->cadFileID = j3["cadfile_id"];
-    this->serializedData = j3["serialized_data"];
-    this->bendCount = j3["bend_count"];
+    userID = j3["user_id"];
+    cadFileID = j3["cadfile_id"];
+    serializedData = j3["serialized_data"];
+    bendCount = j3["bend_count"];
+    taskID = j3["task_id"];
 }
 
 json ProcessPlanningStarted::toJson()

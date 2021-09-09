@@ -4,7 +4,7 @@
 
 struct ProcessPlanningStarted : public Event
 {
-    std::string userID, cadFileID, serializedData;
+    std::string userID, cadFileID, taskID, serializedData;
     int bendCount;
 
     std::string EventName();
