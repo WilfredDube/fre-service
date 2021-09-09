@@ -19,10 +19,6 @@ EventPtr EventMapper::MapEvent(std::string eventName, std::string serialized, in
         FREevent->createEvent(res);
         event = FREevent;
         event->eventType = EventType::FEATURE_REC_START;
-
-        auto f = dynamic_cast<FeatureRecognitionStarted *>(event.get());
-
-        std::cout << "URL: " << f->URL << std::endl;
     }
     else if (eventName == "processPlanningStarted")
     {
@@ -31,10 +27,6 @@ EventPtr EventMapper::MapEvent(std::string eventName, std::string serialized, in
         ppEvent->createEvent(res);
         event = ppEvent;
         event->eventType = EventType::PROCESS_PLAN_START;
-
-        auto f = dynamic_cast<ProcessPlanningStarted *>(event.get());
-
-        std::cout << "CADFILE ID: " << f->cadFileID << std::endl;
     }
     else
     {
