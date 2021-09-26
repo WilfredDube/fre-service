@@ -47,7 +47,7 @@ int main()
   AMQPHandler handler(loop);
 
   // make a connection
-  auto connection = std::make_shared<AMQP::TcpConnection>(&handler, AMQP::Address(AMQPMessageExternalBroker));
+  auto connection = std::make_shared<AMQP::TcpConnection>(&handler, AMQP::Address(AMQPMessageBroker));
 
   auto eventEmitter = std::make_shared<AMQPEventEmitter>(connection, Exchange);
   auto eventListener = std::make_shared<AMQPEventListener>(connection, eventEmitter, Exchange, QueueName);
