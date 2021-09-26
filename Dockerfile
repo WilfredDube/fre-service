@@ -37,12 +37,21 @@ RUN git clone https://github.com/CopernicaMarketingSoftware/AMQP-CPP.git \
     && cmake --build . --target clean \
     && rm -rf ../../AMQP-CPP
 
-RUN wget https://github.com/tpaviot/oce/releases/download/official-upstream-packages/opencascade-7.4.0.tgz \
-    && tar -xzf opencascade-7.4.0.tgz \
-    && cd opencascade-7.4.0/ && mkdir -p build \
+# RUN wget https://github.com/tpaviot/oce/releases/download/official-upstream-packages/opencascade-7.4.0.tgz \
+#     && tar -xzf opencascade-7.4.0.tgz \
+#     && cd opencascade-7.4.0/ && mkdir -p build \
+#     && cd build \
+#     && cmake .. \
+#     && cmake --build . --target install 
+
+RUN git clone https://github.com/Open-Cascade-SAS/OCCT.git \
+    && cd OCCT \
+    && mkdir -p build \
     && cd build \
     && cmake .. \
-    && cmake --build . --target install 
+    && make \
+    && make install \
+    && make clean
 
 WORKDIR /app
 COPY . .
