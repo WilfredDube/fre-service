@@ -45,7 +45,7 @@ RUN git clone https://github.com/CopernicaMarketingSoftware/AMQP-CPP.git \
 #     && cmake --build . --target install 
 
 RUN git clone https://github.com/Open-Cascade-SAS/OCCT.git \
-    cd OCCT \
+    && cd OCCT \
     && mkdir -p build \
     && cd build \
     && cmake .. \
