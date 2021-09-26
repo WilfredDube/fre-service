@@ -1,29 +1,32 @@
-# Building: docker build --pull --rm -f "Dockerfile" -t libfxtract:latest "." --network=host
-# Running: docker run --rm -it  libfxtract:latest
-#           docker run --name frec --network fxtract-network -p 8080:8080 libfxtract:latest
-# OR: docker run -itd  --network=fxtract-network libfxtract:latest
+# We use Ubuntu image as OpenCascade (at least 7.4.0 won't compile on alpine).
+FROM ubuntu:latest
 
-# RabbitMQ: docker run -d --rm --net fxtract-network --hostname fxtract_host --name rabbitmq -p 15672:15672 -p 5672:5672 rabbitmq:latest
-#       docker run --rm -d  -p 15671:15671/tcp -p 15672:15672/tcp -p 15691:15691/tcp -p 15692:15692/tcp -p 25672:25672/tcp -p 4369:4369/tcp -p 5671:5671/tcp -p 5672:5672/tcp rabbitmq:3.8.16-management
-# MongoDB: docker run -d --name mongodb -p 27017:27017 rabbitmq:latest
+# To avoid all sort of prompts from apt-get.
+# You use this mode when you need zero interaction while installing or upgrading the system via apt.
+# It accepts the default answer for all questions. It might mail an error message to the root user,
+# but that's it all. Otherwise, it is totally silent and humble, a perfect frontend for automatic
+# installs. One can use such mode in Dockerfile, shell scripts, cloud-init script, and more.
+ENV DEBIAN_FRONTEND=noninteractive
 
-FROM frolvlad/alpine-gxx AS builder
-
-# Install dependences
-RUN apk add --no-cache make cmake \
-    build-base \
-    boost boost-dev \
-    glew-dev \
-    openssl openssl-dev graphicsmagick tcl \
-    freetype \
-    tcl-dev freetype-dev tk tk-dev libevent-dev git \
-    && rm -rf /var/lib/apt/lists/*
+# The build-essentials packages are meta-packages that are necessary for compiling software.
+# They include the GNU debugger, g++/GNU compiler collection, and some more tools and libraries
+# that are required to compile a program. For example, if you need to work on a C/C++ compiler,
+# you need to install essential meta-packages on your system before starting the C compiler installation.
+# When installing the build-essential packages, some other packages such as G++, dpkg-dev, GCC and make, etc.
+# also install on your system.
+RUN apt-get update --fix-missing && \
+    apt-get -y install build-essential git cmake libboost-all-dev libev-dev \
+    openssl libssl*-dev tcl tcl-dev tk tk-dev libfreeimage-dev libxmu-dev libxi-dev \
+    libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev xvfb wget && \
+    apt-get clean all && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/nlohmann/json.git \
     && cd json && mkdir -p build \
     && cd build \
     && cmake .. \
     && cmake --build . --target install \
+    && cmake --build . --target clean \
     && rm -rf ../../json
 
 RUN git clone https://github.com/CopernicaMarketingSoftware/AMQP-CPP.git \
@@ -31,100 +34,22 @@ RUN git clone https://github.com/CopernicaMarketingSoftware/AMQP-CPP.git \
     && cd build \
     && cmake .. -DAMQP-CPP_BUILD_SHARED=ON -DAMQP-CPP_LINUX_TCP=ON \
     && cmake --build . --target install \
+    && cmake --build . --target clean \
     && rm -rf ../../AMQP-CPP
 
-
-WORKDIR /opt/
-COPY ./third_party/OCCT /opt/
-RUN mkdir -p build \
+RUN wget https://github.com/tpaviot/oce/releases/download/official-upstream-packages/opencascade-7.4.0.tgz \
+    && tar -xzf opencascade-7.4.0.tgz \
+    && cd opencascade-7.4.0/ && mkdir -p build \
     && cd build \
     && cmake .. \
-    && cmake --build . --target install \
-    && rm -rf ../*
+    && cmake --build . --target install 
 
-RUN apk add --no-cache make cmake libev-dev
-
-WORKDIR /src
-COPY . ./
-RUN mkdir -p build \
+WORKDIR /app
+COPY . .
+RUN ls /app && mkdir -p build \
     && cd build \
     && cmake .. \
     && make \
     && make install
 
-CMD ["fxtract"]
-
-
-# FROM frolvlad/alpine-gxx
-
-# WORKDIR /usr/bin
-
-# COPY --from=builder /src/build/fxtract /usr/bin/
-
-# CMD ["/opt/fxtract"]
-
-
-
-
-# FROM cpp-build-base:0.1.0 AS build
-
-# WORKDIR /src
-
-# COPY CMakeLists.txt main.cpp ./
-
-# RUN cmake . && make
-
-# FROM ubuntu:bionic
-
-# WORKDIR /opt/hello-world
-
-# COPY --from=build /src/helloworld ./
-
-# CMD ["./helloworld"]
-
-#     && make clean \
-#     && rm -rf *
-
-# RUN mkdir WtApp && cd WtApp
-# WORKDIR /Fxtract
-# COPY ./* /Fxtract/
-# RUN mkdir -p build \
-#     && cd build \
-#     && cmake .. \
-#     && make 
-
-# RUN mkdir -p third_party \
-#     && cd third_party \
-#     && git clone https://github.com/Open-Cascade-SAS/OCCT.git \
-#     && ls \
-#     && cd OCCT \
-#     && mkdir -p build \
-#     && cd build \
-#     && cmake .. \
-#     && make \
-#     && make install \
-#     && make clean
-
-
-# COPY ./third_party/wt /opt
-# RUN git submodule update --init --recursive
-# RUN apk add --no-cache boost-dev
-# RUN cd wt && mkdir build && cd build && cmake ../ && make && make install && make clean
-# RUN rm -rf wt
-# These commands copy your files into the specified directory in the image
-# and set that as the working location
-# COPY ./third_party/opencascade-7.4.0.tgz /opt/
-# WORKDIR /opt/docker_test
-# COPY ./hello-docker.cpp /opt/docker_test
-# COPY ./Makefile /opt/docker_test
-# COPY ./CMakeLists.txt /opt/docker_test
-
-# This command compiles your app using GCC, adjust for your source code
-# RUN g++ -o hello-docker hello-docker.cpp -lwthttp -lwt
-
-# This command runs your application, comment out this line to compile only
-# CMD ["./hello-docker"]
-
-# LABEL Name=hellogrpc Version=0.0.1
-
-# docker build --pull --rm -f "Dockerfile" -t libfxtract:latest "." --network=host
+CMD ["fre-service"]
