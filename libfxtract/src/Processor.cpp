@@ -58,7 +58,7 @@ std::shared_ptr<Event> ProcessCadFile(EventPtr event)
     result->featureProps.serializedData = save(sheetMetalFeatureModel);
     result->featureProps.ProcessLevel = 1;
     result->featureProps.Thickness = sheetMetalFeatureModel->getThickness();
-    result->featureProps.BenndingForce = -1;
+    result->featureProps.BendingForce = -1;
     result->featureProps.FREtime = total_time;
 
     std::cout << sheetMetalFeatureModel << std::endl;

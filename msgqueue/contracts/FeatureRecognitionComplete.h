@@ -9,7 +9,7 @@ struct FeatureProps
 {
     std::string serializedData;
     int ProcessLevel, BendCount;
-    float Thickness, BenndingForce, FREtime;
+    float Thickness, BendingForce, FREtime;
 };
 
 struct BendFeatures
