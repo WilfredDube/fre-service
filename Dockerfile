@@ -56,7 +56,7 @@ RUN git clone https://github.com/Open-Cascade-SAS/OCCT.git \
 
 WORKDIR /app
 COPY . .
-RUN ls /app && mkdir -p build \
+RUN export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib && mkdir -p build \
     && cd build \
     && cmake .. \
     && make \
