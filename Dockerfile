@@ -50,7 +50,6 @@ RUN git clone https://github.com/Open-Cascade-SAS/OCCT.git \
     && mkdir -p build \
     && cd build \
     && cmake .. \
-    -BUILD_LIBRARY_TYPE="static" \
     -DCMAKE_BUILD_TYPE=release \
     && make \
     && make install \
