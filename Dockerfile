@@ -63,6 +63,6 @@ RUN mkdir -p build \
     && make \
     && make install
 
-RUN LD_LIBRARY_PATH="/lib:/usr/lib:/usr/local/lib"
+ENV LD_LIBRARY_PATH="/lib:/usr/lib:/usr/local/lib"
 
 CMD ["fre-service"]
