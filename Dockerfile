@@ -50,16 +50,19 @@ RUN git clone https://github.com/Open-Cascade-SAS/OCCT.git \
     && cd build \
     && cmake .. \
     -DCMAKE_BUILD_TYPE=release \
+    -DBUILD_LIBRARY_TYPE=static \
     && make \
     && make install \
     && make clean
 
 WORKDIR /app
 COPY . .
-RUN export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib && mkdir -p build \
+RUN mkdir -p build \
     && cd build \
     && cmake .. \
     && make \
     && make install
+
+RUN LD_LIBRARY_PATH="/lib:/usr/lib:/usr/local/lib"
 
 CMD ["fre-service"]
