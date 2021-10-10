@@ -20,7 +20,6 @@
 #include "logging/include/StandardOutputLogger.h"
 
 #include <functional>
-// namespace fs = std::filesystem;
 
 using json = nlohmann::json;
 
@@ -31,9 +30,9 @@ enum class ProcessLevel
   PROCESS_PLAN_GEN
 };
 
-std::string AMQPMessageBroker = "amqp://guest:guest@rabbitmq";
+// std::string AMQPMessageBroker = "amqp://guest:guest@rabbitmq";
 std::string Exchange = "processes";
-std::string AMQPMessageExternalBroker = "amqp://guest:guest@localhost:5672";
+// std::string AMQPMessageExternalBroker = "amqp://guest:guest@localhost:5672";
 
 /**
  *  Main program
@@ -50,6 +49,19 @@ int main()
   Logger loggingService = std::make_shared<Fxt::Logging::StandardOutputLogger>("feature-recognition-service");
   loggingService->writeInfoEntry(__FILE__, __LINE__, "Starting feature-recognition-service service....");
 
+  std::string AMQPAddress;
+  try
+  {
+    AMQPAddress = std::getenv("AMQP");
+  }
+  catch (const std::exception &e)
+  {
+    loggingService->writeErrorEntry(__FILE__, __LINE__, e.what());
+    exit(1);
+  }
+
+  // make a connection to AMQP broker
+  auto connection = std::make_shared<AMQP::TcpConnection>(&handler, AMQP::Address(AMQPAddress));
 
   auto eventEmitter = std::make_shared<AMQPEventEmitter>(connection, Exchange, loggingService);
   auto eventListener = std::make_shared<AMQPEventListener>(connection, eventEmitter, Exchange, QueueName, loggingService);
@@ -62,6 +74,5 @@ int main()
 
   eventListener->Listen(events, f);
 
-  // done
   return 0;
 }
