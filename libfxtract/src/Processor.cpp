@@ -9,21 +9,21 @@
 #include "../../msgqueue/contracts/FeatureRecognitionStarted.h"
 #include "../../msgqueue/contracts/FeatureRecognitionComplete.h"
 
-std::shared_ptr<Event> ProcessCadFile(EventPtr event)
+std::shared_ptr<Event> ProcessCadFile(EventPtr event, Logger loggingService)
 {
     int startTime = clock();
 
     auto cadFile = dynamic_cast<FeatureRecognitionStarted *>(event.get());
+    loggingService->setLoggingID(cadFile->userID, cadFile->cadFileID);
 
     auto sheetMetalFeatureModel = std::make_shared<Fxt::SheetMetalComponent::SheetMetal>();
-    auto loggingService = std::make_shared<Fxt::Logging::StandardOutputLogger>("0");
     auto cadReaderFactory = std::make_shared<Fxt::CadFileReader::CadFileReaderFactory>(loggingService);
 
     auto cadFileReader = cadReaderFactory->createReader(cadFile->URL.c_str());
 
     if (!cadFileReader->isUsable())
     {
-        std::cerr << "Unknown file format : Fxtract only accepts iges and step file formats." << std::endl;
+        loggingService->writeErrorEntry(__FILE__, __LINE__, "Unknown file format : Fxtract only accepts iges and step file formats.");
         return nullptr;
     }
 
@@ -66,7 +66,8 @@ std::shared_ptr<Event> ProcessCadFile(EventPtr event)
     result->featureProps.BendingForce = -1;
     result->featureProps.FREtime = total_time;
 
-    std::cout << sheetMetalFeatureModel << std::endl;
+    // std::cout << sheetMetalFeatureModel << std::endl;
 
+    loggingService->writeInfoEntry(__FILE__, __LINE__, "Feature recognition complete.......");
     return result;
 }

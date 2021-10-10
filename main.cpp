@@ -17,6 +17,7 @@
 #include "msgqueue/amqp/AMQPEventListener.h"
 #include "msgqueue/amqp/AMQPHandler.h"
 #include "libfxtract/include/Processor.h"
+#include "logging/include/StandardOutputLogger.h"
 
 #include <functional>
 // namespace fs = std::filesystem;
@@ -46,17 +47,18 @@ int main()
   // handler for libev
   AMQPHandler handler(loop);
 
-  // make a connection
-  auto connection = std::make_shared<AMQP::TcpConnection>(&handler, AMQP::Address(AMQPMessageBroker));
+  Logger loggingService = std::make_shared<Fxt::Logging::StandardOutputLogger>("feature-recognition-service");
+  loggingService->writeInfoEntry(__FILE__, __LINE__, "Starting feature-recognition-service service....");
 
-  auto eventEmitter = std::make_shared<AMQPEventEmitter>(connection, Exchange);
-  auto eventListener = std::make_shared<AMQPEventListener>(connection, eventEmitter, Exchange, QueueName);
+
+  auto eventEmitter = std::make_shared<AMQPEventEmitter>(connection, Exchange, loggingService);
+  auto eventListener = std::make_shared<AMQPEventListener>(connection, eventEmitter, Exchange, QueueName, loggingService);
 
   std::string event("featureRecognitionStarted");
   std::vector<std::string> events;
   events.push_back(event);
 
-  std::function<std::shared_ptr<Event>(EventPtr event)> f = ProcessCadFile;
+  std::function<std::shared_ptr<Event>(EventPtr event, Logger loggingService)> f = ProcessCadFile;
 
   eventListener->Listen(events, f);
 
