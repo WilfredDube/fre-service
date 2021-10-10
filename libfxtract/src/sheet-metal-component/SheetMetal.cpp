@@ -216,6 +216,11 @@ bool SheetMetal::reduceModelSize()
         done = true;
     }
 
+    if (!done)
+    {
+        throw "Unable to reduce model size.";
+    }
+
     return done;
 }
 

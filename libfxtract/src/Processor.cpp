@@ -32,9 +32,14 @@ std::shared_ptr<Event> ProcessCadFile(EventPtr event)
     sheetMetalFeatureModel->computeBendAngles();
     sheetMetalFeatureModel->assignBendDirection();
 
-    if (sheetMetalFeatureModel->reduceModelSize())
+    try
     {
-        loggingService->writeInfoEntry({"Done......."});
+        sheetMetalFeatureModel->reduceModelSize();
+        loggingService->writeInfoEntry(__FILE__, __LINE__, "Model resize done.......");
+    }
+    catch (const std::exception &e)
+    {
+        loggingService->writeErrorEntry(__FILE__, __LINE__, e.what());
     }
 
     int stopTime = clock();
