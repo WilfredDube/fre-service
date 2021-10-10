@@ -10,8 +10,8 @@
 
 AMQPEventListener::AMQPEventListener(std::shared_ptr<AMQP::TcpConnection> &connection,
                                      std::shared_ptr<EventEmitter> eventEmitter,
-                                     std::string exchange, std::string queue)
-    : connection{connection}, eventEmitter{eventEmitter}, exchange{exchange}, queue{queue}
+                                     std::string exchange, std::string queue, Logger loggingService)
+    : connection{connection}, eventEmitter{eventEmitter}, exchange{exchange}, queue{queue}, loggingService{loggingService}
 {
     setUp();
 }
@@ -24,14 +24,14 @@ void AMQPEventListener::setUp()
     channel.declareExchange(exchange, AMQP::topic, AMQP::durable);
 
     channel.declareQueue(QueueName, AMQP::durable)
-        .onSuccess([](const std::string &name, uint32_t messagecount, uint32_t consumercount)
-                   { std::cout << "Connecting to queue: " << name << std::endl; })
-        .onError([](const char *message)
-                 { std::cout << "Queue declaration failed: " << message << std::endl; });
+        .onSuccess([&](const std::string &name, uint32_t messagecount, uint32_t consumercount)
+                   { loggingService->writeInfoEntry(__FILE__, __LINE__, "Connecting to queue: " + name); })
+        .onError([&](const char *message)
+                 { loggingService->writeErrorEntry(__FILE__, __LINE__, "Queue declaration failed: " + std::string(message)); });
 }
 
 void AMQPEventListener::Listen(std::vector<std::string> &list,
-                               std::function<std::shared_ptr<Event>(EventPtr event)> &ProcessCadFile)
+                               std::function<std::shared_ptr<Event>(EventPtr event, Logger loggingService)> &ProcessCadFile)
 {
     AMQP::TcpChannel channel(connection.get());
 
@@ -39,8 +39,8 @@ void AMQPEventListener::Listen(std::vector<std::string> &list,
     for (auto &event : list)
     {
         channel.bindQueue(exchange, queue, event)
-            .onError([](const char *message)
-                     { std::cout << "Queue binding failed: " << message << std::endl; });
+            .onError([&](const char *message)
+                     { loggingService->writeErrorEntry(__FILE__, __LINE__, "Queue binding failed: " + std::string(message)); });
     }
 
     channel.consume(QueueName, "", AMQP::noack)
@@ -51,24 +51,22 @@ void AMQPEventListener::Listen(std::vector<std::string> &list,
                         auto mapper = std::make_shared<EventMapper>();
                         auto event = mapper->MapEvent(eventName, message.body(), (int)message.bodySize());
 
-                        // TODO: Feature recognition
-                        auto result = ProcessCadFile(event);
+                        auto result = ProcessCadFile(event, loggingService);
 
                         if (result == nullptr)
                         {
-                            std::cerr << "Failed to recognise features" << std::endl;
+                            loggingService->writeErrorEntry(__FILE__, __LINE__, "Failed to generate processing plan");
                             return;
                         }
 
-                        std::cout << "Publishing features..." << std::endl;
+                        loggingService->writeInfoEntry(__FILE__, __LINE__, "Publishing processing plan....");
                         eventEmitter->Emit(result);
                     })
         .onSuccess([&]() {})
         .onError([](const char *message)
                  { std::cout << "Queue binding failed: " << message << std::endl; })
-        .onFinalize([]()
-                    { std::cout << "OnFinalize operation failed" << std::endl; });
+        .onFinalize([&]()
+                    { loggingService->writeErrorEntry(__FILE__, __LINE__, "OnFinalize operation failed"); });
 
-    std::cout << "Received========================" << std::endl;
     ev_run(loop, 0);
 }
