@@ -253,8 +253,6 @@ bool SheetMetal::removeOuterBendFaces()
     if (outerBends.size() == allModelBends.size())
         allModelBends = outerBends;
 
-    std::cout << "All : " << allModelBends.size() << std::endl;
-    std::cout << "Out : " << outerBends.size() << std::endl;
     return (outerBends.size() == allModelBends.size());
 }
 
