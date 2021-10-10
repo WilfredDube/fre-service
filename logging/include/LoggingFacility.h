@@ -5,46 +5,54 @@
 #include <sstream>
 #include <string_view>
 
-namespace Fxt 
+namespace Fxt
 {
-namespace Logging
-{
-    class ILoggingFacility
+    namespace Logging
     {
-    public:
-        ILoggingFacility(std::string_view username) : username { username } {}
-        virtual ~ILoggingFacility() = default;
-        
-        virtual void writeInfoEntry(std::string_view entry, std::string_view other = "") = 0;
-        virtual void writeWarnEntry(std::string_view entry, std::string_view other = "") = 0;
-        virtual void writeErrorEntry(std::string_view entry, std::string_view other = "") = 0;
-
-        inline std::string formatMessage(std::string_view entry, std::string_view other = "") noexcept
+        class ILoggingFacility
         {
-            std::ostringstream ostr;
-            ostr << dateTimeString() << " : { " 
-                 << username << " } : [ " 
-                 << other << " ] -> " 
-                 << entry;
+        public:
+            ILoggingFacility(std::string_view service) : service{service} {}
+            virtual ~ILoggingFacility() = default;
 
-            return ostr.str();
-        }
+            virtual void writeInfoEntry(std::string_view caller, int line, std::string_view message) = 0;
+            virtual void writeWarnEntry(std::string_view caller, int line, std::string_view message) = 0;
+            virtual void writeErrorEntry(std::string_view caller, int line, std::string_view message) = 0;
 
-    private:
-        std::string_view username;
+            inline void setLoggingID(std::string_view userId, std::string_view cadfileId)
+            {
+                this->userID = userId;
+                this->cadfileID = cadfileId;
+            }
 
-        inline std::string dateTimeString() noexcept
-        {
-            std::time_t t_t = time(nullptr); // Get current system time
-            std::tm* t = localtime(&t_t); // Convert to local tim
+            inline std::string formatMessage(std::string_view caller, int line, std::string_view message) noexcept
+            {
+                std::ostringstream ostr;
+                ostr << dateTimeString() << "; UserID: "
+                     << userID << "; CADfileID: "
+                     << cadfileID << "; Service: "
+                     << service << "; Caller: "
+                     << caller << ":" << line << "; Message: "
+                     << message;
 
-            char buffer[256];
-            strftime(buffer, sizeof(buffer), "%c", t);
+                return ostr.str();
+            }
 
-            return buffer;
-        }
-    };
-}
+        private:
+            std::string_view userID, cadfileID, service;
+
+            inline std::string dateTimeString() noexcept
+            {
+                std::time_t t_t = time(nullptr); // Get current system time
+                std::tm *t = localtime(&t_t);    // Convert to local tim
+
+                char buffer[256];
+                strftime(buffer, sizeof(buffer), "%c", t);
+
+                return buffer;
+            }
+        };
+    }
 }
 
 using Logger = std::shared_ptr<Fxt::Logging::ILoggingFacility>;

@@ -4,17 +4,17 @@
 
 using namespace Fxt::Logging;
 
-void StandardOutputLogger::writeInfoEntry(std::string_view entry, std::string_view other)
+void StandardOutputLogger::writeInfoEntry(std::string_view caller, int line, std::string_view message)
 {
-    std::cout << "INFO: " << formatMessage(entry, other) << '\n';
+    std::cout << "INFO: " << formatMessage(caller, line, message) << '\n';
 }
 
-void StandardOutputLogger::writeWarnEntry(std::string_view entry, std::string_view other)
+void StandardOutputLogger::writeWarnEntry(std::string_view caller, int line, std::string_view message)
 {
-    std::cout << "WARN: " << formatMessage(entry, other) << '\n';
+    std::cout << "WARN: " << formatMessage(caller, line, message) << '\n';
 }
 
-void StandardOutputLogger::writeErrorEntry(std::string_view entry, std::string_view other)
+void StandardOutputLogger::writeErrorEntry(std::string_view caller, int line, std::string_view message)
 {
-    std::cout << "ERROR: " << formatMessage(entry, other) << '\n';
+    std::cout << "ERROR: " << formatMessage(caller, line, message) << '\n';
 }

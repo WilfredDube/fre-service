@@ -2,11 +2,14 @@
 
 using namespace Fxt::Logging;
 
-void FileSystemLogger::writeInfoEntry(std::string_view entry, std::string_view other)
-{}
+void FileSystemLogger::writeInfoEntry(std::string_view caller, int line, std::string_view message)
+{
+}
 
-void FileSystemLogger::writeWarnEntry(std::string_view entry, std::string_view other)
-{}
+void FileSystemLogger::writeWarnEntry(std::string_view caller, int line, std::string_view message)
+{
+}
 
-void FileSystemLogger::writeErrorEntry(std::string_view entry, std::string_view other)
-{}
+void FileSystemLogger::writeErrorEntry(std::string_view caller, int line, std::string_view message)
+{
+}
