@@ -9,6 +9,9 @@
 #include "../../msgqueue/contracts/FeatureRecognitionStarted.h"
 #include "../../msgqueue/contracts/FeatureRecognitionComplete.h"
 
+#include "../../cloud/include/cloud.h"
+#include "../../cloud/include/URL.h"
+
 std::shared_ptr<Event> ProcessCadFile(EventPtr event, Logger loggingService)
 {
     int startTime = clock();
@@ -27,7 +30,19 @@ std::shared_ptr<Event> ProcessCadFile(EventPtr event, Logger loggingService)
         return nullptr;
     }
 
-    cadFileReader->extractFaces(sheetMetalFeatureModel, cadFile->URL.c_str());
+    URL u(cadFile->URL.c_str());
+    auto blob_name = u.extractBlobName();
+
+    std::string stepfile = "temp.stp";
+    std::ofstream fout(stepfile);
+
+    // Download file from the cloud
+    auto cloudService = std::make_shared<CloudStorage>();
+    fout << cloudService->downloadBlob(blob_name);
+
+    fout.close();
+
+    cadFileReader->extractFaces(sheetMetalFeatureModel, stepfile);
     sheetMetalFeatureModel->classifyFaces();
     sheetMetalFeatureModel->computeBendAngles();
     sheetMetalFeatureModel->assignBendDirection();
@@ -65,8 +80,6 @@ std::shared_ptr<Event> ProcessCadFile(EventPtr event, Logger loggingService)
     result->featureProps.Thickness = sheetMetalFeatureModel->getThickness();
     result->featureProps.BendingForce = -1;
     result->featureProps.FREtime = total_time;
-
-    // std::cout << sheetMetalFeatureModel << std::endl;
 
     loggingService->writeInfoEntry(__FILE__, __LINE__, "Feature recognition complete.......");
     return result;
