@@ -1,15 +1,3 @@
-/**
- *  LibEV.cpp
- * 
- *  Test program to check AMQP functionality based on LibEV
- * 
- *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2015 - 2018 Copernica BV
- */
-
-/**
- *  Dependencies
- */
 #include <ev.h>
 
 #include "msgqueue/Mapper.h"
@@ -30,14 +18,8 @@ enum class ProcessLevel
   PROCESS_PLAN_GEN
 };
 
-// std::string AMQPMessageBroker = "amqp://guest:guest@rabbitmq";
 std::string Exchange = "processes";
-// std::string AMQPMessageExternalBroker = "amqp://guest:guest@localhost:5672";
 
-/**
- *  Main program
- *  @return int
- */
 int main()
 {
   // access to the event loop
