@@ -12,13 +12,17 @@ EventPtr EventMapper::MapEvent(std::string eventName, std::string serialized, in
 {
     EventPtr event;
 
+    std::cout << __FILE__ << ":" << __LINE__ << "Mapping started...\n";
+
     if (eventName == "featureRecognitionStarted")
     {
+        std::cout << __FILE__ << ":" << __LINE__ << "FRE mapper started...\n";
         std::string res = serialized.substr(0, size);
         auto FREevent = std::make_shared<FeatureRecognitionStarted>();
         FREevent->createEvent(res);
         event = FREevent;
         event->eventType = EventType::FEATURE_REC_START;
+        std::cout << __FILE__ << ":" << __LINE__ << "FRE mapper done...\n";
     }
     else if (eventName == "processPlanningStarted")
     {
@@ -33,6 +37,8 @@ EventPtr EventMapper::MapEvent(std::string eventName, std::string serialized, in
         std::cerr << "unknown event type" << eventName << std::endl;
         return std::make_shared<NullEvent>();
     }
+
+    std::cout << __FILE__ << ":" << __LINE__ << "Mapping done...\n";
 
     return event;
 }

@@ -48,18 +48,22 @@ void AMQPEventListener::Listen(std::vector<std::string> &list,
                         const AMQP::Message &message, uint64_t deliveryTag,
                         bool redelivered)
                     {
+                        loggingService->writeInfoEntry(__FILE__, __LINE__, "Starting feature recognition....");
                         auto mapper = std::make_shared<EventMapper>();
                         auto event = mapper->MapEvent(eventName, message.body(), (int)message.bodySize());
 
+                        loggingService->writeInfoEntry(__FILE__, __LINE__, "Mapped...");
+
                         auto result = ProcessCadFile(event, loggingService);
 
+                        loggingService->writeInfoEntry(__FILE__, __LINE__, "Extracted...");
                         if (result == nullptr)
                         {
-                            loggingService->writeErrorEntry(__FILE__, __LINE__, "Failed to generate processing plan");
+                            loggingService->writeErrorEntry(__FILE__, __LINE__, "Failed to extract feature");
                             return;
                         }
 
-                        loggingService->writeInfoEntry(__FILE__, __LINE__, "Publishing processing plan....");
+                        loggingService->writeInfoEntry(__FILE__, __LINE__, "Publishing feature....");
                         eventEmitter->Emit(result);
                     })
         .onSuccess([&]() {})
