@@ -22,6 +22,7 @@ std::shared_ptr<Event> ProcessCadFile(EventPtr event, Logger loggingService)
     auto sheetMetalFeatureModel = std::make_shared<Fxt::SheetMetalComponent::SheetMetal>();
     auto cadReaderFactory = std::make_shared<Fxt::CadFileReader::CadFileReaderFactory>(loggingService);
 
+    loggingService->writeInfoEntry(__FILE__, __LINE__, "Creating reader.......");
     auto cadFileReader = cadReaderFactory->createReader(cadFile->URL.c_str());
 
     if (!cadFileReader->isUsable())
@@ -30,22 +31,27 @@ std::shared_ptr<Event> ProcessCadFile(EventPtr event, Logger loggingService)
         return nullptr;
     }
 
+    loggingService->writeInfoEntry(__FILE__, __LINE__, "Extracting blobname.......");
     URL u(cadFile->URL.c_str());
     auto blob_name = u.extractBlobName();
 
+    loggingService->writeInfoEntry(__FILE__, __LINE__, "Creating temp file.......");
     std::string stepfile = "temp.stp";
     std::ofstream fout(stepfile);
 
     // Download file from the cloud
+    loggingService->writeInfoEntry(__FILE__, __LINE__, "Downloading.......");
     auto cloudService = std::make_shared<CloudStorage>();
     fout << cloudService->downloadBlob(blob_name);
 
     fout.close();
 
+    loggingService->writeInfoEntry(__FILE__, __LINE__, "FRE.......");
     cadFileReader->extractFaces(sheetMetalFeatureModel, stepfile);
     sheetMetalFeatureModel->classifyFaces();
     sheetMetalFeatureModel->computeBendAngles();
     sheetMetalFeatureModel->assignBendDirection();
+    loggingService->writeInfoEntry(__FILE__, __LINE__, "FRE - Done.......");
 
     try
     {
