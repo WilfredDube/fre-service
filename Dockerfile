@@ -15,7 +15,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # When installing the build-essential packages, some other packages such as G++, dpkg-dev, GCC and make, etc.
 # also install on your system.
 RUN apt-get update --fix-missing && \
-    apt-get -y install build-essential git cmake libboost-all-dev libev-dev \
+    apt-get -y install build-essential git cmake libboost-all-dev libev-dev libcurl-dev \
     openssl libssl*-dev tcl tcl-dev tk tk-dev libfreeimage-dev libxmu-dev libxi-dev \
     libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev xvfb wget && \
     apt-get clean all && \
