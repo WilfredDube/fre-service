@@ -7,6 +7,7 @@ link_libraries(stdc++fs)
 add_subdirectory(logging)
 add_subdirectory(libfxtract)
 add_subdirectory(msgqueue)
+add_subdirectory(cloud)
 #add_subdirectory(tests)
 
 set(main_source_files
@@ -32,7 +33,7 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 add_executable (fre-service ${main_source_files})
 target_include_directories(fre-service PRIVATE ${amqpcpp_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-target_link_libraries(fre-service logger frelib msgqueue -g ${Boost_LIBRARIES} Threads::Threads -lboost_serialization ev boost_system dl Threads::Threads ${amqpcpp_LIBRARIES} amqpcpp nlohmann_json::nlohmann_json)
+target_link_libraries(fre-service logger frelib msgqueue cloud -g ${Boost_LIBRARIES} -lboost_serialization ev boost_system dl Threads::Threads ${amqpcpp_LIBRARIES} amqpcpp nlohmann_json::nlohmann_json)
 
 install(
   TARGETS fre-service 
