@@ -37,6 +37,12 @@ RUN git clone https://github.com/CopernicaMarketingSoftware/AMQP-CPP.git \
     && cmake --build . --target clean \
     && rm -rf ../../AMQP-CPP
 
+RUN git clone https://github.com/azure/azure-storage-cpplite.git \
+    && cd azure-storage-cpplite && mkdir -p build && cd build \ 
+    && cmake .. -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build . \ 
+    && cmake --build . --target install
+
 # RUN wget https://github.com/tpaviot/oce/releases/download/official-upstream-packages/opencascade-7.4.0.tgz \
 #     && tar -xzf opencascade-7.4.0.tgz \
 #     && cd opencascade-7.4.0/ && mkdir -p build \
