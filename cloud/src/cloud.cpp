@@ -15,13 +15,17 @@ CloudStorage::CloudStorage()
 
 std::string CloudStorage::downloadBlob(std::string blobName)
 {
+    std::cout << "Creating ostringStream" << std::endl;
     std::ostringstream out_stream;
+    std::cout << "Now downloading blob" << std::endl;
     auto ret = blobClient->download_blob_to_stream(containerName, blobName, 0, 0, out_stream).get();
+    std::cout << "Finished downloading blob" << std::endl;
     if (!ret.success())
     {
         std::cout << "Failed to download blob, Error: " << ret.error().code << ", " << ret.error().code_name << std::endl;
         return nullptr;
     }
 
+    std::cout << "Returning blob" << std::endl;
     return out_stream.str();
 }

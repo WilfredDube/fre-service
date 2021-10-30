@@ -40,8 +40,9 @@ std::shared_ptr<Event> ProcessCadFile(EventPtr event, Logger loggingService)
     std::ofstream fout(stepfile);
 
     // Download file from the cloud
-    loggingService->writeInfoEntry(__FILE__, __LINE__, "Downloading.......");
+    loggingService->writeInfoEntry(__FILE__, __LINE__, "Created cloud service.......");
     auto cloudService = std::make_shared<CloudStorage>();
+    loggingService->writeInfoEntry(__FILE__, __LINE__, "Downloading blob.......");
     fout << cloudService->downloadBlob(blob_name);
 
     fout.close();
